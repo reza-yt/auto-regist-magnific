@@ -45,9 +45,8 @@ async function registerSingleAccount(proxyManager, accountNumber = 1) {
   let result = null;
 
   try {
-    // Create mail provider with fallback
-    const proxyAgent = proxyManager.hasProxies() ? proxyManager.createAgent() : null;
-    const { provider, account } = await createMailWithFallback(proxyAgent);
+    // Create mail provider with fallback (no proxy for mail - direct connection)
+    const { provider, account } = await createMailWithFallback(null);
     mailProvider = provider;
 
     // Register account

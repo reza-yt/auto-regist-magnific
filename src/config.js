@@ -17,7 +17,7 @@ if (existsSync(envPath)) {
 
 export const config = {
   // Proxy
-  proxyMode: process.env.PROXY_MODE || 'scrape',
+  proxyMode: process.env.PROXY_MODE || 'none',
   proxyUrl: process.env.PROXY_URL || '',
   rotatingProxyUrl: process.env.ROTATING_PROXY_URL || '',
   proxyListFile: join(ROOT_DIR, 'proxies.txt'),

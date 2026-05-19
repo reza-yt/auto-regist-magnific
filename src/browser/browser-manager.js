@@ -51,15 +51,17 @@ export class BrowserManager {
       ],
     };
 
-    // Add proxy if available
-    if (this.proxyManager && this.proxyManager.hasProxies()) {
-      const proxy = this.proxyManager.getNext();
-      if (proxy) {
-        this.proxy = proxy;
-        launchOptions.proxy = this.proxyManager.getPlaywrightProxy(proxy);
-        logger.info(`Using proxy: ${proxy.host}:${proxy.port}`);
-      }
-    }
+    // Proxy disabled - using direct connection
+    // To re-enable: uncomment below and set PROXY_MODE in .env
+    // if (this.proxyManager && this.proxyManager.hasProxies()) {
+    //   const proxy = this.proxyManager.getNext();
+    //   if (proxy) {
+    //     this.proxy = proxy;
+    //     launchOptions.proxy = this.proxyManager.getPlaywrightProxy(proxy);
+    //     logger.info(`Using proxy: ${proxy.host}:${proxy.port}`);
+    //   }
+    // }
+    logger.info('Using direct connection (no proxy)');
 
     this.browser = await chromium.launch(launchOptions);
 

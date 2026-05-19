@@ -240,6 +240,10 @@ export async function createProxyManager() {
   const manager = new ProxyManager();
 
   switch (config.proxyMode) {
+    case 'none':
+      // No proxy - direct connection
+      logger.info('Proxy mode: NONE (direct connection)');
+      break;
     case 'file':
       manager.loadFromFile();
       break;
@@ -271,7 +275,7 @@ export async function createProxyManager() {
       manager.loadFromFile();
   }
 
-  if (!manager.hasProxies()) {
+  if (!manager.hasProxies() && config.proxyMode !== 'none') {
     logger.warn('⚠ No proxies loaded! Running without proxy (not recommended).');
   }
 
