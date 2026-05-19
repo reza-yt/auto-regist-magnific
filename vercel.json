@@ -1,0 +1,20 @@
+{
+  "functions": {
+    "app/api/register/route.js": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "app/api/extract-key/route.js": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "app/api/proxy-scrape/route.js": {
+      "maxDuration": 60,
+      "memory": 512
+    },
+    "app/api/status/route.js": {
+      "maxDuration": 10,
+      "memory": 256
+    }
+  }
+}
