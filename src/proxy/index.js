@@ -53,41 +53,54 @@ export class ProxyManager {
 
   /**
    * Parse proxy URL into structured object
+   * Validates that host and port are actually valid
    */
   parseProxy(proxyStr) {
     try {
-      // Support formats:
-      // protocol://user:pass@host:port
-      // host:port:user:pass
-      // host:port
+      if (!proxyStr || typeof proxyStr !== 'string') return null;
+      const cleaned = proxyStr.trim();
+      if (!cleaned || cleaned.length < 7) return null; // Minimum: "1.2.3:4"
 
       let url;
-      if (proxyStr.includes('://')) {
-        url = new URL(proxyStr);
+      if (cleaned.includes('://')) {
+        url = new URL(cleaned);
       } else {
-        const parts = proxyStr.split(':');
+        const parts = cleaned.split(':');
         if (parts.length === 4) {
-          // host:port:user:pass
           url = new URL(`http://${parts[2]}:${parts[3]}@${parts[0]}:${parts[1]}`);
         } else if (parts.length === 2) {
-          // host:port
           url = new URL(`http://${parts[0]}:${parts[1]}`);
         } else {
-          throw new Error(`Invalid proxy format: ${proxyStr}`);
+          return null;
         }
+      }
+
+      const host = url.hostname;
+      const port = parseInt(url.port);
+
+      // Validate host (must be IP or valid domain)
+      if (!host || host.length < 3) return null;
+
+      // Validate port (must be valid number 1-65535)
+      if (!port || isNaN(port) || port < 1 || port > 65535) return null;
+
+      // Validate IP format if it looks like an IP
+      if (/^\d+\.\d+\.\d+\.\d+$/.test(host)) {
+        const octets = host.split('.').map(Number);
+        if (octets.some(o => o < 0 || o > 255)) return null;
       }
 
       return {
         protocol: url.protocol.replace(':', ''),
-        host: url.hostname,
-        port: parseInt(url.port),
+        host,
+        port,
         username: url.username || null,
         password: url.password || null,
-        raw: proxyStr,
+        raw: cleaned,
         url: url.toString(),
       };
     } catch (error) {
-      logger.warn(`Invalid proxy format: ${proxyStr} - ${error.message}`);
+      // Silently skip invalid proxies (don't spam logs during bulk import)
       return null;
     }
   }
@@ -150,14 +163,26 @@ export class ProxyManager {
     const p = proxy || this.getNext();
     if (!p) return null;
 
-    const isSocks = p.protocol.startsWith('socks');
+    try {
+      const isSocks = p.protocol.startsWith('socks');
+      const auth = p.username ? `${p.username}:${p.password}@` : '';
 
-    if (isSocks) {
-      const socksUrl = `${p.protocol}://${p.username ? `${p.username}:${p.password}@` : ''}${p.host}:${p.port}`;
-      return new SocksProxyAgent(socksUrl);
-    } else {
-      const httpUrl = `${p.protocol}://${p.username ? `${p.username}:${p.password}@` : ''}${p.host}:${p.port}`;
-      return new HttpsProxyAgent(httpUrl);
+      if (isSocks) {
+        const socksUrl = `${p.protocol}://${auth}${p.host}:${p.port}`;
+        return new SocksProxyAgent(socksUrl);
+      } else {
+        const httpUrl = `http://${auth}${p.host}:${p.port}`;
+        return new HttpsProxyAgent(httpUrl);
+      }
+    } catch (error) {
+      logger.warn(`Failed to create agent for ${p.host}:${p.port}: ${error.message}`);
+      this.blacklist(p);
+      // Try next proxy
+      const next = this.getNext();
+      if (next && next.raw !== p.raw) {
+        return this.createAgent(next);
+      }
+      return null;
     }
   }
 
