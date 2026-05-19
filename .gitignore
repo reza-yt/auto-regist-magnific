@@ -1,0 +1,8 @@
+node_modules/
+.env
+api_keys.txt
+keys_output.txt
+logs/
+*.log
+.DS_Store
+Thumbs.db
