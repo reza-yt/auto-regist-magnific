@@ -211,7 +211,7 @@ export class ProxyManager {
 /**
  * Create and initialize proxy manager based on config
  */
-export function createProxyManager() {
+export async function createProxyManager() {
   const manager = new ProxyManager();
 
   switch (config.proxyMode) {
@@ -226,6 +226,20 @@ export function createProxyManager() {
     case 'rotating_service':
       if (config.rotatingProxyUrl) {
         manager.addProxy(config.rotatingProxyUrl);
+      }
+      break;
+    case 'scrape':
+      // Auto-scrape free proxies from internet
+      try {
+        const { scrapeProxies } = await import('./scraper.js');
+        const proxies = await scrapeProxies();
+        for (const p of proxies) {
+          manager.addProxy(p);
+        }
+        logger.info(`Auto-scraped ${proxies.length} free proxies`);
+      } catch (error) {
+        logger.warn(`Proxy scraping failed: ${error.message}. Trying file fallback...`);
+        manager.loadFromFile();
       }
       break;
     default:

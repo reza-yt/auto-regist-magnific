@@ -105,7 +105,7 @@ async function batchRegister(count, concurrency = 1) {
   logInfo(`  Concurrency: ${concurrency}`);
   logInfo(`${'═'.repeat(60)}\n`);
 
-  const proxyManager = createProxyManager();
+  const proxyManager = await createProxyManager();
 
   if (proxyManager.hasProxies()) {
     const stats = proxyManager.getStats();
@@ -202,7 +202,7 @@ program
         logInfo(`  MAGNIFIC.AI AUTO REGISTRATION - SINGLE MODE`);
         logInfo(`${'═'.repeat(60)}\n`);
 
-        const proxyManager = createProxyManager();
+        const proxyManager = await createProxyManager();
         const result = await registerSingleAccount(proxyManager, 1);
 
         if (result) {

@@ -1,16 +1,29 @@
 import winston from 'winston';
 import chalk from 'chalk';
-import config from '../config.js';
+import { existsSync, mkdirSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-const { combine, timestamp, printf, colorize } = winston.format;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const ROOT_DIR = join(__dirname, '..', '..');
+const LOG_DIR = join(ROOT_DIR, 'logs');
 
-const customFormat = printf(({ level, message, timestamp, ...meta }) => {
-  const metaStr = Object.keys(meta).length ? ` ${JSON.stringify(meta)}` : '';
-  return `${chalk.gray(timestamp)} [${level}] ${message}${metaStr}`;
+// Ensure logs directory exists
+if (!existsSync(LOG_DIR)) {
+  mkdirSync(LOG_DIR, { recursive: true });
+}
+
+const { combine, timestamp, printf } = winston.format;
+
+const customFormat = printf(({ level, message, timestamp: ts }) => {
+  return `${chalk.gray(ts)} [${level}] ${message}`;
 });
 
+const logLevel = process.env.LOG_LEVEL || 'info';
+
 export const logger = winston.createLogger({
-  level: config.logLevel,
+  level: logLevel,
   format: combine(
     timestamp({ format: 'HH:mm:ss' }),
     customFormat
@@ -18,12 +31,12 @@ export const logger = winston.createLogger({
   transports: [
     new winston.transports.Console(),
     new winston.transports.File({
-      filename: 'logs/error.log',
+      filename: join(LOG_DIR, 'error.log'),
       level: 'error',
       format: combine(timestamp(), winston.format.json()),
     }),
     new winston.transports.File({
-      filename: 'logs/combined.log',
+      filename: join(LOG_DIR, 'combined.log'),
       format: combine(timestamp(), winston.format.json()),
     }),
   ],

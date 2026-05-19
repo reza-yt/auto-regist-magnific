@@ -1,254 +1,169 @@
-# 🚀 Magnific.ai Auto Registration & API Key Extractor
+# Magnific.ai Auto Registration & API Key Extractor (CLI)
 
-Alat otomasi lengkap untuk registrasi akun magnific.ai, konfirmasi email, dan ekstraksi API key secara otomatis.
+Tool CLI untuk otomasi registrasi akun magnific.ai, konfirmasi email, dan ekstraksi API key secara otomatis.
 
-## ✨ Fitur Utama
+## Fitur
 
-- **Auto Registrasi** - Otomatis mendaftar akun magnific.ai
-- **Temp Mail Multi-Provider** - Mendukung Mail.tm (gratis), Guerrilla Mail (gratis), dan Kopeechka (berbayar, paling reliable)
-- **Auto Konfirmasi Email** - Otomatis mendeteksi dan mengklik link verifikasi
-- **Auto Get API Key** - Login otomatis dan ekstrak API key dari dashboard
-- **Anti-Detect Browser** - Fingerprint spoofing lengkap (WebGL, Canvas, Audio, Timezone, dll)
-- **Proxy Rotation** - Support HTTP/HTTPS/SOCKS4/SOCKS5 dengan auto-rotation
-- **Human-Like Behavior** - Typing, clicking, scrolling yang mirip manusia
+- **Auto Registrasi** - Daftar akun magnific.ai otomatis
+- **Temp Mail** - Mail.tm (gratis), Guerrilla Mail (gratis), Kopeechka (berbayar)
+- **Auto Konfirmasi Email** - Deteksi & klik link verifikasi otomatis
+- **Auto Get API Key** - Login & ekstrak API key dari dashboard
+- **Anti-Detect Browser** - Fingerprint spoofing (WebGL, Canvas, Audio, Timezone, dll)
+- **Free Proxy Scraper** - Otomatis ambil 300+ proxy gratis dari internet
+- **Proxy Rotation** - HTTP/HTTPS/SOCKS4/SOCKS5 dengan auto-rotation
+- **Human-Like Behavior** - Typing, clicking, scrolling mirip manusia
 - **Batch Mode** - Registrasi banyak akun sekaligus
-- **Auto Retry** - Retry otomatis jika gagal dengan exponential backoff
 
-## 📋 Persyaratan
+## Persyaratan
 
 - **Node.js** >= 18.x
 - **npm** atau **yarn**
-- Proxy list (sangat disarankan)
-- (Opsional) Kopeechka API key untuk temp mail paling reliable
 
-## 🛠️ Instalasi
+## Instalasi
 
 ```bash
-# Clone atau copy project
+git clone https://github.com/reza-yt/auto-regist-magnific.git
 cd auto-regist-magnific
 
 # Install dependencies
 npm install
 
-# Install Playwright browsers
+# Install Playwright Chromium browser
 npx playwright install chromium
 
-# Copy dan edit konfigurasi
+# Copy config
 cp .env.example .env
-nano .env
 ```
 
-## ⚙️ Konfigurasi
-
-### File `.env`
-
-```env
-# Proxy
-PROXY_MODE=file              # file, single, rotating_service
-PROXY_URL=socks5://user:pass@host:port
-
-# Temp Mail Provider
-TEMP_MAIL_PROVIDER=mail_tm   # mail_tm, guerrilla, kopeechka
-KOPEECHKA_API_KEY=           # Jika pakai kopeechka
-
-# Registration
-BATCH_COUNT=5
-REGISTRATION_DELAY=15000
-MAX_RETRIES=3
-
-# Browser
-HEADLESS=true
-
-# Output
-OUTPUT_FILE=api_keys.txt
-```
-
-### File `proxies.txt`
-
-```text
-# Satu proxy per baris
-# Format: protocol://user:pass@host:port
-socks5://user:pass@1.2.3.4:1080
-http://user:pass@5.6.7.8:8080
-http://9.10.11.12:3128
-```
-
-## 🚀 Penggunaan
+## Penggunaan
 
 ### Mode Single (1 Akun)
 
 ```bash
-# Registrasi 1 akun
-npm start
-
-# Atau langsung
 node src/index.js
 ```
 
 ### Mode Batch (Banyak Akun)
 
 ```bash
-# Registrasi 5 akun
 node src/index.js --mode=batch --count=5
+```
 
-# Dengan concurrency (hati-hati rate limit)
-node src/index.js --mode=batch --count=10 --concurrency=2
+### Scrape Proxy Dulu (Manual)
+
+```bash
+node src/proxy/scraper.js
 ```
 
 ### CLI Options
 
-```bash
-node src/index.js --help
-
+```
 Options:
-  -m, --mode <mode>          Mode: register atau batch (default: "register")
-  -c, --count <number>       Jumlah akun untuk batch mode (default: "5")
-  --concurrency <number>     Registrasi bersamaan (default: "1")
-  --provider <name>          Temp mail: mail_tm, guerrilla, kopeechka
-  --proxy <url>              Single proxy URL
-  --no-headless              Jalankan dengan browser visible (untuk debug)
-  --output <file>            File output API keys
-  -h, --help                 Tampilkan bantuan
+  -m, --mode <mode>       register (single) atau batch (default: register)
+  -c, --count <number>    Jumlah akun batch mode (default: 5)
+  --concurrency <number>  Registrasi bersamaan (default: 1)
+  --provider <name>       mail_tm, guerrilla, kopeechka
+  --proxy <url>           Single proxy URL
+  --no-headless           Browser visible (debug)
+  --output <file>         File output API keys
+  -h, --help              Bantuan
 ```
 
-### Contoh Penggunaan
+### Contoh
 
 ```bash
-# Single dengan proxy tertentu
+# Single + proxy manual
 node src/index.js --proxy="socks5://user:pass@1.2.3.4:1080"
 
-# Batch 10 akun dengan kopeechka (paling reliable)
-node src/index.js --mode=batch --count=10 --provider=kopeechka
+# Batch 10 akun, auto scrape proxy
+node src/index.js --mode=batch --count=10
 
-# Debug mode (browser visible)
+# Debug mode (lihat browser)
 node src/index.js --no-headless
 
-# Custom output file
-node src/index.js --mode=batch --count=5 --output="keys_output.txt"
+# Pakai kopeechka (paling reliable)
+node src/index.js --provider=kopeechka
 ```
 
-## 📁 Struktur Project
+## Konfigurasi (.env)
+
+```env
+# Proxy mode: scrape (auto), file (dari proxies.txt), single
+PROXY_MODE=scrape
+
+# Temp mail provider
+TEMP_MAIL_PROVIDER=mail_tm
+
+# Browser headless
+HEADLESS=true
+
+# Output
+OUTPUT_FILE=api_keys.txt
+```
+
+## Struktur Project
 
 ```
 auto-regist-magnific/
 ├── src/
-│   ├── index.js                    # Main entry point + CLI
-│   ├── config.js                   # Configuration loader
+│   ├── index.js                 # Main CLI
+│   ├── config.js                # Config loader
 │   ├── browser/
-│   │   ├── browser-manager.js      # Anti-detect browser session
-│   │   └── fingerprint.js          # Fingerprint generation & injection
+│   │   ├── browser-manager.js   # Anti-detect browser
+│   │   └── fingerprint.js       # Fingerprint spoofing
 │   ├── mail/
-│   │   ├── index.js                # Mail factory with fallback
-│   │   ├── mail-tm.js              # Mail.tm provider (gratis)
-│   │   ├── guerrilla-mail.js       # Guerrilla Mail provider (gratis)
-│   │   └── kopeechka.js            # Kopeechka provider (berbayar)
+│   │   ├── index.js             # Mail factory + fallback
+│   │   ├── mail-tm.js           # Mail.tm (gratis)
+│   │   ├── guerrilla-mail.js    # Guerrilla Mail (gratis)
+│   │   └── kopeechka.js         # Kopeechka (berbayar)
 │   ├── proxy/
-│   │   └── index.js                # Proxy manager with rotation
+│   │   ├── index.js             # Proxy manager + rotation
+│   │   └── scraper.js           # Free proxy scraper
 │   ├── registration/
-│   │   ├── register.js             # Registration automation
-│   │   └── api-key-extractor.js    # API key extraction
+│   │   ├── register.js          # Registration flow
+│   │   └── api-key-extractor.js # API key extraction
 │   └── utils/
-│       ├── helpers.js              # Utility functions
-│       └── logger.js               # Winston logger
-├── logs/                           # Log files & screenshots
-├── proxies.txt                     # Proxy list
-├── api_keys.txt                    # Output: extracted API keys
-├── .env.example                    # Config template
-├── .env                            # Your config (gitignored)
-├── package.json
-└── README.md
+│       ├── helpers.js           # Utilities
+│       └── logger.js            # Logger
+├── proxies.txt                  # Proxy list (auto-generated or manual)
+├── api_keys.txt                 # Output API keys
+├── .env.example                 # Config template
+└── package.json
 ```
 
-## 🔑 Output Format
+## Output
 
-API keys disimpan di `api_keys.txt` dengan format:
+API keys disimpan di `api_keys.txt`:
 
 ```
 [2025-01-15T10:30:45.123Z]
-Email: randomuser123@domain.com
+Email: randomuser@domain.com
 Password: xK9#mP2$nQ7wL4
-API Key: mk_live_abc123def456ghi789...
-============================================================
-
-[2025-01-15T10:35:12.456Z]
-Email: anotheruser456@domain.com
-Password: hT5@jR8&vB3mN6
-API Key: mk_live_xyz789abc123def456...
+API Key: mk_live_abc123def456...
 ============================================================
 ```
 
-## 🛡️ Anti-Detect Features
+## Anti-Detect
 
-### Browser Fingerprint Spoofing
-- ✅ Random User-Agent (Chrome versi terbaru, multi-platform)
-- ✅ WebGL Vendor & Renderer spoofing
-- ✅ Canvas fingerprint noise injection
-- ✅ AudioContext spoofing
-- ✅ Screen resolution randomization
-- ✅ Timezone spoofing + matching geolocation
-- ✅ Navigator properties (platform, hardwareConcurrency, deviceMemory)
-- ✅ Battery API spoofing
-- ✅ Connection API spoofing
-- ✅ Plugin/mime-type injection
-- ✅ WebDriver flag removal
-- ✅ Chrome runtime mock
+- Random User-Agent (Chrome terbaru, multi-platform)
+- WebGL Vendor & Renderer spoofing
+- Canvas fingerprint noise
+- AudioContext spoofing
+- Timezone + geolocation matching
+- Navigator override (platform, cores, memory)
+- WebDriver flag removal
+- Chrome runtime mock
+- Human-like typing (variable speed, typos)
+- Random scrolling & mouse movement
 
-### Human-Like Behavior
-- ✅ Variable typing speed (50-150ms per karakter)
-- ✅ Occasional typos + correction (3% chance)
-- ✅ Random pauses saat mengetik
-- ✅ Mouse movement dengan bezier curve
-- ✅ Random scrolling setelah page load
-- ✅ Random delays antar aksi
+## Tips
 
-### Proxy & Network
-- ✅ HTTP/HTTPS/SOCKS4/SOCKS5 support
-- ✅ Round-robin rotation dengan cooldown
-- ✅ Auto-blacklist dead proxies
-- ✅ Per-proxy usage tracking
-- ✅ Proxy health monitoring
+1. **Pakai proxy** - Tanpa proxy IP cepat diblock
+2. **Kopeechka** untuk reliability terbaik (domain real)
+3. **Jangan spam** - Delay minimal 10-15 detik antar registrasi
+4. **Debug** - Pakai `--no-headless` kalau gagal
+5. **Auto scrape** - Set `PROXY_MODE=scrape` untuk otomatis ambil proxy gratis
 
-## 📧 Temp Mail Providers
+## License
 
-| Provider | Tipe | Reliability | Catatan |
-|----------|------|-------------|---------|
-| **Kopeechka** | Berbayar | ⭐⭐⭐⭐⭐ | Domain real, paling jarang diblock |
-| **Mail.tm** | Gratis | ⭐⭐⭐⭐ | API bagus, kadang diblock |
-| **Guerrilla Mail** | Gratis | ⭐⭐⭐ | Fallback, domain terkenal |
-
-### Rekomendasi:
-- Untuk **hasil terbaik**: Gunakan **Kopeechka** (domain real, tidak diblock magnific)
-- Untuk **gratis**: Gunakan **Mail.tm** (paling stabil dari yang gratis)
-- Tool akan otomatis fallback ke provider lain jika satu gagal
-
-## ⚠️ Tips & Troubleshooting
-
-### Proxy Wajib!
-Tanpa proxy, IP kamu akan cepat diblokir. Gunakan minimal 10-20 proxy untuk batch mode.
-
-### Delay Antar Registrasi
-Jangan set delay terlalu kecil. Minimal 10-15 detik antar registrasi.
-
-### Kopeechka untuk Get API Key
-Jika sering gagal di tahap get API key, kemungkinan email temp diblock. Gunakan Kopeechka yang pakai domain real.
-
-### Debug Mode
-Jika gagal, jalankan dengan `--no-headless` untuk melihat apa yang terjadi di browser.
-
-### Error Umum
-- `"All mail providers failed"` → Cek koneksi internet/proxy
-- `"Could not find email input"` → Magnific mungkin ganti layout, update selectors
-- `"API key extraction failed"` → Login berhasil tapi halaman API berubah
-- `"Proxy blacklisted"` → Semua proxy mati, tambah proxy baru
-
-## 📝 Catatan Penting
-
-- Tool ini untuk **keperluan edukasi dan development**
-- Gunakan secara **bertanggung jawab**
-- Hormati **Terms of Service** dari setiap layanan
-- Jangan melakukan spam atau abuse
-- Proxy berkualitas sangat mempengaruhi tingkat keberhasilan
-
-## 📄 License
-
-MIT License
+MIT
