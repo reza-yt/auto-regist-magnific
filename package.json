@@ -1,26 +1,23 @@
 {
   "name": "magnific-auto-regist",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Auto registration tool for magnific.ai - Vercel deployable with web dashboard",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "postinstall": "npm install @sparticuz/chromium@126 || true"
+    "lint": "next lint"
   },
   "dependencies": {
     "next": "^14.2.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "playwright-core": "^1.45.0",
+    "@sparticuz/chromium": "^126.0.0",
     "axios": "^1.7.2",
     "cheerio": "^1.0.0-rc.12",
     "uuid": "^10.0.0"
-  },
-  "optionalDependencies": {
-    "@sparticuz/chromium": "^126.0.0"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.4",

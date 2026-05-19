@@ -2,11 +2,7 @@
   "functions": {
     "app/api/register/route.js": {
       "maxDuration": 300,
-      "memory": 1024
-    },
-    "app/api/extract-key/route.js": {
-      "maxDuration": 300,
-      "memory": 1024
+      "memory": 3009
     },
     "app/api/proxy-scrape/route.js": {
       "maxDuration": 60,
@@ -16,5 +12,13 @@
       "maxDuration": 10,
       "memory": 256
     }
-  }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache" }
+      ]
+    }
+  ]
 }
