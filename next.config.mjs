@@ -1,14 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Serverless function config
-  experimental: {
-    serverComponentsExternalPackages: ['playwright-core', '@sparticuz/chromium'],
-  },
-  // Increase API route body size for proxy lists
-  api: {
-    bodyParser: {
-      sizeLimit: '4mb',
-    },
+  // External packages for serverless functions
+  serverExternalPackages: ['playwright-core', '@sparticuz/chromium'],
+  // Webpack config to handle optional deps
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.externals = config.externals || [];
+      config.externals.push('@sparticuz/chromium');
+    }
+    return config;
   },
 };
 
